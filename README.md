@@ -9,7 +9,7 @@ Then I thought about it... What should be the UI format? I want my friends to us
 
 ### Hunt For A UI Format...
 
-Now I started thinking. How about a desktop app? Yes, it can run so fast and is quick to launch, do stuff, and close. Best for my scenario. So I have 2 main options
+Now I started thinking. How about a desktop app? Yes, it can run so fast and is quick to launch, do stuff, and close. Best for my scenario. So I have few options
 1. WPF
 2. WinForms
 3. Electron
@@ -51,7 +51,7 @@ It gives me the following big advantages
 1. DeskKiosk.Server (With ASP.NET)
 2. DeskKiosk.Client (React SPA)
 
-### Then I added a "Windown Forms App" project to the same solution. I named it "App". So now I have 3 projects in my solution
+### Then I added a "Windows Forms App" project to the same solution. I named it "App". So now I have 3 projects in my solution
 1. DeskKiosk.Server (With ASP.NET)
 2. DeskKiosk.Client (React SPA)
 3. App (WinForms)
