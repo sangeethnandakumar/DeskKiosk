@@ -179,32 +179,52 @@ namespace App
 
         private void Main_Load(object sender, EventArgs e)
         {
-            TerminateProcessByName(Path.GetFileNameWithoutExtension(EXE_NAME));
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            if (IsServerRunning())
             {
-                FileName = Path.Combine(SERVER_LOC, EXE_NAME),
-                WorkingDirectory = SERVER_LOC,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardInput = false,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false
-            };
-            Process process = new Process
+                Browser.Load(SERVER_URL);
+            }
+            else
             {
-                StartInfo = startInfo
-            };
-            process.Start();
-            Browser.Load(SERVER_URL);
+                StartServer();
+                Browser.Load(SERVER_URL);
+            }
         }
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            TerminateProcessByName(Path.GetFileNameWithoutExtension(EXE_NAME));
+            if (IsLastInstance())
+            {
+                TerminateServer();
+            }
         }
 
-        private static void TerminateProcessByName(string processName)
+        private void StartServer()
         {
+            if (!IsServerRunning())
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = Path.Combine(SERVER_LOC, EXE_NAME),
+                    WorkingDirectory = SERVER_LOC,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardInput = false,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false
+                };
+
+                Process process = new Process
+                {
+                    StartInfo = startInfo
+                };
+
+                process.Start();
+            }
+        }
+
+        private void TerminateServer()
+        {
+            string processName = Path.GetFileNameWithoutExtension(EXE_NAME);
             Process[] processes = Process.GetProcessesByName(processName);
 
             foreach (var process in processes)
@@ -219,6 +239,20 @@ namespace App
                     Console.WriteLine($"Error terminating process {process.ProcessName}: {ex.Message}");
                 }
             }
+        }
+
+        private bool IsServerRunning()
+        {
+            string processName = Path.GetFileNameWithoutExtension(EXE_NAME);
+            Process[] processes = Process.GetProcessesByName(processName);
+
+            return processes.Length > 0;
+        }
+
+        private bool IsLastInstance()
+        {
+            // Check if this is the last instance of the application running
+            return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 1;
         }
     }
 }
