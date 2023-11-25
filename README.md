@@ -167,16 +167,23 @@ namespace App
 {
     public partial class Main : Form
     {
+        const string SERVER_URL = "http://127.0.0.1:5000/";
+        const string SERVER_LOC = @"C:\Users\Sangeeth Nandakumar\source\repos\DeskKiosk\DeskKiosk.Server\bin\Release\net8.0\publish";
+        const string EXE_NAME = "DeskKiosk.Server.exe";
+
         public Main()
         {
             InitializeComponent();
+            Browser.MenuHandler = new InvisibleMenuHandler();
         }
+
         private void Main_Load(object sender, EventArgs e)
         {
-            TerminateProcessByName("DeskKiosk.Server");
+            TerminateProcessByName(Path.GetFileNameWithoutExtension(EXE_NAME));
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = Path.Combine(@"DeskKiosk.Server.exe"),
+                FileName = Path.Combine(SERVER_LOC, EXE_NAME),
+                WorkingDirectory = SERVER_LOC,
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardInput = false,
@@ -188,17 +195,18 @@ namespace App
                 StartInfo = startInfo
             };
             process.Start();
-            Browser.Load("http://127.0.0.1:5000/");
+            Browser.Load(SERVER_URL);
         }
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            TerminateProcessByName("DeskKiosk.Server");
+            TerminateProcessByName(Path.GetFileNameWithoutExtension(EXE_NAME));
         }
 
         private static void TerminateProcessByName(string processName)
         {
             Process[] processes = Process.GetProcessesByName(processName);
+
             foreach (var process in processes)
             {
                 try
@@ -220,14 +228,7 @@ namespace App
 
 > Every time our app loads, it restarts the server. Every time you close your app it terminates the server so it won't run in the background without noticing
 
-Now change these things:
-1. Set your WebAPI's URL instead of "http://127.0.0.1:5000/"
-2. Set your WebAPI's Published Exe name instead of "DeskKiosk.Server"
-
 ## Now when you launch your WinForms app, It tries to launch the ASP.NET Core server in the background, And the server outputs the static react published artifacts directly to the browser. It works without the user noticing anything. Cherry on top.. It's fast..! Fast as ASP.NET Core ..!
-
-> IMPORTANT
-### TO RUN, YOU NEED TO MANUALLY COPY THE PUBLISHED FOLDER CONTENTS INTO YOUR WINFORMS PROJECT'S DEBUG FOLDER. Otherwise, you'll get an error. This is because the WinForms project tries to look for your server in the same directory as it runs.
 
 So this could be your workflow
 1. Build and test everything frontend and backend within Visual Studio
