@@ -37,14 +37,14 @@
             this.Browser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Browser.Location = new System.Drawing.Point(0, 0);
             this.Browser.Name = "Browser";
-            this.Browser.Size = new System.Drawing.Size(984, 585);
+            this.Browser.Size = new System.Drawing.Size(868, 455);
             this.Browser.TabIndex = 0;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 585);
+            this.ClientSize = new System.Drawing.Size(868, 455);
             this.Controls.Add(this.Browser);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

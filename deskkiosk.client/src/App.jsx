@@ -33,7 +33,7 @@ function App() {
 
     return (
         <div>
-            <h1 id="tabelLabel">Sangee</h1>
+            <h1 id="tabelLabel">Ok OK</h1>
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
         </div>
