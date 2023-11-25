@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34310.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeskKiosk.Server", "DeskKiosk.Server\DeskKiosk.Server.csproj", "{8E1D3F2C-69BD-471D-A4C9-99A835508DB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeskKiosk.Server", "DeskKiosk.Server\DeskKiosk.Server.csproj", "{8E1D3F2C-69BD-471D-A4C9-99A835508DB9}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "deskkiosk.client", "deskkiosk.client\deskkiosk.client.esproj", "{E57C2EF0-44FB-4BFC-BC22-A50F5D2F61CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{736E451E-52C3-48B6-98CF-677E0869D592}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{E57C2EF0-44FB-4BFC-BC22-A50F5D2F61CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E57C2EF0-44FB-4BFC-BC22-A50F5D2F61CB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E57C2EF0-44FB-4BFC-BC22-A50F5D2F61CB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{736E451E-52C3-48B6-98CF-677E0869D592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{736E451E-52C3-48B6-98CF-677E0869D592}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{736E451E-52C3-48B6-98CF-677E0869D592}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{736E451E-52C3-48B6-98CF-677E0869D592}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
