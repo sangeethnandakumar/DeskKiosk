@@ -238,3 +238,57 @@ So this could be your workflow
 6. Now WinForms project has Server exe within it's working directory
 7. Now run WinForms project
 8. It will work ..!
+
+## Few Other Fixes
+Everything works... But when you right-click on the webview you may see this context menu.Not sure if you like it but I don't. This give the users ability to print or lookup the HTML source code. Not something I prefer considering this as a desktop app.
+
+![image](https://github.com/sangeethnandakumar/DeskKiosk/assets/24974154/c168fe42-7ff4-492e-8dbc-cc88aa2081ec)
+
+So I need to get rid of this context menu.
+
+So I created an `InvisibleMenuHandler.cs` class
+
+```csharp
+using CefSharp;
+
+namespace App
+{
+    public class InvisibleMenuHandler : IContextMenuHandler
+    {
+        public void OnBeforeContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
+        {
+            model.Clear();
+        }
+
+        public bool OnContextMenuCommand(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, CefMenuCommand commandId, CefEventFlags eventFlags)
+        {
+            return false;
+        }
+
+        public void OnContextMenuDismissed(IWebBrowser browserControl, IBrowser browser, IFrame frame)
+        {
+
+        }
+
+        public bool RunContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model, IRunContextMenuCallback callback)
+        {
+            return false;
+        }
+    }
+}
+```
+
+Then used it like this:
+
+```csharp
+ public partial class Main : Form
+ {
+     public Main()
+     {
+         InitializeComponent();
+         Browser.MenuHandler = new InvisibleMenuHandler();
+     }
+
+      //Rest of your code...
+```
+
