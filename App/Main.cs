@@ -1,6 +1,9 @@
-﻿using System;
+﻿using CefSharp;
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace App
@@ -14,20 +17,23 @@ namespace App
         public Main()
         {
             InitializeComponent();
-            Browser.MenuHandler = new InvisibleMenuHandler();
+            Browser.MenuHandler = new InvisibleMenuHandler();           
         }
 
         private void Main_Load(object sender, EventArgs e)
         {
-            if (IsServerRunning())
+            Task.Run(() =>
             {
-                Browser.Load(SERVER_URL);
-            }
-            else
-            {
-                StartServer();
-                Browser.Load(SERVER_URL);
-            }
+                if (IsServerRunning())
+                {
+                    Browser.Load(SERVER_URL);
+                }
+                else
+                {
+                    StartServer();
+                    Browser.Load(SERVER_URL);
+                }
+            });
         }
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
