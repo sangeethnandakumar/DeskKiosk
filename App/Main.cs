@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CefSharp;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace App
         public Main()
         {
             InitializeComponent();
-            Browser.MenuHandler = new InvisibleMenuHandler();
+            Browser.MenuHandler = new InvisibleMenuHandler();           
         }
 
         private void Main_Load(object sender, EventArgs e)
