@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace App
@@ -19,15 +20,18 @@ namespace App
 
         private void Main_Load(object sender, EventArgs e)
         {
-            if (IsServerRunning())
+            Task.Run(() =>
             {
-                Browser.Load(SERVER_URL);
-            }
-            else
-            {
-                StartServer();
-                Browser.Load(SERVER_URL);
-            }
+                if (IsServerRunning())
+                {
+                    Browser.Load(SERVER_URL);
+                }
+                else
+                {
+                    StartServer();
+                    Browser.Load(SERVER_URL);
+                }
+            });
         }
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)

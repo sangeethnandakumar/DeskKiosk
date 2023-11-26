@@ -33,13 +33,17 @@ function App() {
 
     return (
         <div>
-            <h1 id="tabelLabel">Ok OK</h1>
-            <p>This component demonstrates fetching data from the server.</p>
+            <h1 id="tabelLabel">Sangee</h1>
+            {/*<button onClick={window.shell.Execute("exit")}>*/}
+            {/*    Click Me To Sent A Command To WinForms Shell*/}
+            {/*</button>*/}
+            <p>{JSON.stringify(window.shell)}</p>
             {contents}
         </div>
     );
     
     async function populateWeatherData() {
+        console.log(window.shell);
         const response = await fetch('http://localhost:5000/WeatherForecast');
         const data = await response.json();
         setForecasts(data);
