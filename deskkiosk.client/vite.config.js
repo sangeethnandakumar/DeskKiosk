@@ -12,11 +12,15 @@ export default defineConfig({
     server: {
         proxy: {
             '^/weatherforecast': {
-                target: 'http://localhost:5173', // Change the target URL as needed
+                target: 'http://localhost:5173',
                 secure: false
             }
         },
+        cors: {
+            origin: 'http://localhost:5173', // Specify the exact origin
+            credentials: true,
+        },
         port: 5173,
-        https: false, // Set to false to disable HTTPS
+        https: false,
     }
 });
