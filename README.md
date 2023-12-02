@@ -80,19 +80,22 @@ export default defineConfig({
                 secure: false
             }
         },
+        cors: false,
         port: 5173,
-        https: false, // Set to false to disable HTTPS
+        https: false,
     }
 });
-
 ```
 
-> Here, We're telling for development purpose launch Vite server on `http://localhost:5173` and disable HTTPS. DONE with frontend..!
+> Here, We're telling for development purposes to launch Vite server on `http://localhost:5173` and disable HTTPS. DONE with frontend..!
 
 # Step 2: Rewrite Program.cs
 Now comes the WebAPI part. here configure Program.cs as follows:
 
+### POINT THE WEBROOT TO THE DIST FOLDER OF YOUR SPA. This is mandatory for resolving static files if debugging
+
 ```csharp
+using DeskKiosk.Server.Infrastructure;
 using System.Net;
 
 namespace DeskKiosk.Server
@@ -101,7 +104,11 @@ namespace DeskKiosk.Server
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+            {
+                Args = args,
+                WebRootPath = @"C:\Users\Sangeeth Nandakumar\source\repos\DeskKiosk\deskkiosk.client\dist"
+            });
             builder.WebHost.UseKestrel(options =>
             {
                 options.Listen(IPAddress.Loopback, 5000);
@@ -111,22 +118,25 @@ namespace DeskKiosk.Server
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSignalR();
+            builder.Services.AddSingleton<SignalRHub>();
 
             var app = builder.Build();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
             app.UseSwagger();
             app.UseSwaggerUI();
-
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-
+            app.UseCors(builder => builder
+                .WithOrigins("http://localhost:5173", "http://127.0.0.1:5000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+            );
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.MapFallbackToFile("/index.html");
+            app.MapHub<SignalRHub>("/signalrhub");
 
             app.Run();
         }
@@ -331,3 +341,111 @@ Then used it like this:
       //Rest of your code...
 ```
 
+# Communication
+
+For communication between UI and the backend, We will rely on SignalR. A much much faster reliable way of real-time communication. This is essential because if you prefer to use API controllers although possible may seem a little slow as the HTTP connections need to resolve. By using SignalR, we leverage on multiple transports like WebSockets to polling to have a realtime communication.
+
+To start with, Change the files as follows:
+
+## SignalR Hub
+
+```csharp
+using Microsoft.AspNetCore.SignalR;
+using System.Text;
+
+namespace DeskKiosk.Server.Infrastructure
+{
+    public class SignalRHub : Hub
+    {
+        public async Task InvokeAsync(string component, string methodName, object payload)
+        {
+            await Clients.All.SendAsync($"{component}_{methodName}", payload);
+        }
+
+        public async Task AppPage_OnTextChange(string message)
+        {
+            await InvokeAsync("AppPage", "OnTextChange", Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            if(message.Length > 5)
+            {
+                await InvokeAsync("AppPage", "OnAlert", Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            }
+        }
+    }
+}
+```
+
+## Latch.js
+
+To avoid polluting the UI, The best idea is to move SignalR mechanics to a file called `latch.js`. It keeps the connection and exposes  methods `on` and `invoke`. Use accordingly
+
+```js
+// latch.js controls incomming and outgoing communications using SignalR as backbone
+
+import { HubConnectionBuilder } from "@microsoft/signalr";
+
+class Latch {
+    constructor() {
+        this.connection = null;
+        this.initializeConnection();
+    }
+
+    initializeConnection() {
+        this.connection = new HubConnectionBuilder()
+            .withUrl("http://127.0.0.1:5000/signalrhub")
+            .withAutomaticReconnect()
+            .build();
+
+        this.connection.start().catch((error) => console.log(error));
+    }
+
+    on(component, methodName, callback) {
+        this.connection.on(`${component}_${methodName}`, callback);
+    }
+
+    invoke(component, methodName, ...args) {
+        this.connection.invoke(`${component}_${methodName}`, ...args);
+    }
+}
+
+const latch = new Latch();
+
+export default latch;
+```
+
+## App.jsx
+
+Once `Latch.js` is ready, We can simply use to to publish and subscribe to events. You can sent any objects you want to and from server easily blazingly fast and aid communication.
+
+```jsx
+// App.js
+
+import { useState, useEffect } from 'react';
+import latch from './latch';
+
+function App() {
+    const [text, setText] = useState('');
+    const [encodedText, setEncodedText] = useState('');
+
+    useEffect(() => {
+        latch.on("AppPage", "OnTextChange", msg => setEncodedText(msg));
+        latch.on("AppPage", "OnAlert", msg => alert(msg));
+    }, []);
+
+    const onTextChange = (e) => {
+        setText(e.target.value);
+        latch.invoke("AppPage", "OnTextChange", e.target.value);
+    }
+
+    return (
+        <div>
+            <h1>Base64 Encoder / Decoder</h1>
+            <textarea rows="5" cols="100" placeholder="Normal Text" value={text} onChange={onTextChange}></textarea>
+            <br />
+            <br />
+            <textarea rows="5" cols="100" disabled placeholder="Encoded Text" value={encodedText}></textarea>
+        </div>
+    );
+}
+
+export default App;
+```
