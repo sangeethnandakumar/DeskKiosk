@@ -3,22 +3,20 @@ using System.Text;
 
 namespace DeskKiosk.Server.Infrastructure
 {
-    public class BridgeCommand
-    {
-        public string Command { get; set; }
-        public dynamic Params { get; set; }
-    }
-
     public class SignalRHub : Hub
     {
-        public async Task SendNotificationAsync(BridgeCommand message)
+        public async Task InvokeAsync(string component, string methodName, object payload)
         {
-            await Clients.All.SendAsync("NotificationListner", message);
-        } 
-        
-        public async Task SendMessage(string message)
+            await Clients.All.SendAsync($"{component}_{methodName}", payload);
+        }
+
+        public async Task AppPage_OnTextChange(string message)
         {
-            await Clients.All.SendAsync("NotificationListner", Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            await InvokeAsync("AppPage", "OnTextChange", Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            if(message.Length > 5)
+            {
+                await InvokeAsync("AppPage", "OnAlert", Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+            }
         }
     }
 }

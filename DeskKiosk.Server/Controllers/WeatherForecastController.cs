@@ -17,11 +17,7 @@ namespace DeskKiosk.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            await hub.SendNotificationAsync(new BridgeCommand
-            {
-                Command = "loadState",
-                Params = true
-            });
+            await hub.AppPage_OnTextChange("Hello Test");
             return Ok();
         }
     }
